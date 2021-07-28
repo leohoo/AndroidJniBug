@@ -4,35 +4,27 @@
 
 #define LOGD(...)	__android_log_print(ANDROID_LOG_DEBUG, "TEST", __VA_ARGS__)
 
-static const char* ArrToString(const int* arr, int len)
+static void logArray(const int* arr, int len)
 {
-    static char string[1024];
-    string[0] = 0;
-    char item[100]{};
+    char item[100];
 
     for (int i = 0; i < len; i++) {
         int v = arr[i];
-        sprintf(item, "%d, ", v);
-        strcat(string, item);
+        snprintf(item, 100,"%d", v);
+        LOGD("arr[%d] = %s", i, item);
     }
-    return string;
 }
 
 void CallJavaWorker(JNIEnv* env, jobject worker, float *output)
 {
-    jfloatArray outputArray = env->NewFloatArray(2);
-
     jclass cls = env->GetObjectClass(worker);
-    jmethodID mid = env->GetMethodID(cls, "work", "([F)V");
+    jmethodID mid = env->GetMethodID(cls, "work", "()V");
     if (mid == nullptr) {
         return;
     }
 
-    env->CallVoidMethod(worker, mid, outputArray);
-    jfloat* jscore = env->GetFloatArrayElements(outputArray, nullptr);
-    output[0] = jscore[0];
-    output[1] = jscore[1];
-    env->ReleaseFloatArrayElements(outputArray, jscore, 0);
+    env->CallVoidMethod(worker, mid);
+    output[0] = 999;
 }
 
 extern "C"
@@ -50,9 +42,8 @@ Java_jp_co_normee_bugjni_MainActivity_nativeTest(JNIEnv *env, jobject thiz, jobj
             const int LEN = 5;
             int array[LEN] = {8888, 9999, 1, sum, ret};
 
-            LOGD("array = %s", ArrToString(array, LEN));
+            logArray(array, LEN);
         }
     }
     return ret;
 }
-

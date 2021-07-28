@@ -26,14 +26,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        int r = nativeTest(new Worker());
-
-        Log.d(TAG, String.format("r = %d", r));
+        nativeTest(new Worker());
         Log.d(TAG, "==============================");
-
-        // Example of a call to a native method
-        TextView tv = binding.sampleText;
-        tv.setText(String.format("looped %d times", r));
     }
 
     public native int nativeTest(Object worker);
