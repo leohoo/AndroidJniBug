@@ -1,0 +1,2 @@
+rootProject.name = "BugJNI"
+include ':app'
