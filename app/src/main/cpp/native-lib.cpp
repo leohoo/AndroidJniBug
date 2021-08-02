@@ -7,15 +7,13 @@
 static void logArray(const int* arr, int len)
 {
     char item[100];
-
     for (int i = 0; i < len; i++) {
-        int v = arr[i];
-        snprintf(item, 100,"%d", v);
+        snprintf(item, sizeof(item), "%x", arr[i]);
         LOGD("arr[%d] = %s", i, item);
     }
 }
 
-void CallJavaWorker(JNIEnv* env, jobject worker, float *output)
+void CallJavaWorker(JNIEnv* env, jobject worker, int *output)
 {
     jclass cls = env->GetObjectClass(worker);
     jmethodID mid = env->GetMethodID(cls, "work", "()V");
@@ -24,26 +22,25 @@ void CallJavaWorker(JNIEnv* env, jobject worker, float *output)
     }
 
     env->CallVoidMethod(worker, mid);
-    output[0] = 999;
+    output[0] = 0x11111111;
 }
 
 extern "C"
-JNIEXPORT jint JNICALL
+JNIEXPORT void JNICALL
 Java_jp_co_normee_bugjni_MainActivity_nativeTest(JNIEnv *env, jobject thiz, jobject worker)
 {
-    int ret;
+    int arr[1] = {};
+
     for(int step=0; step<2; step++) {
         if (step == 0) {
-            float output[2] = {};
-            CallJavaWorker(env, worker, output);
-            int sum = (int)(output[0]);
-            ret = (int)(output[1]);
+            CallJavaWorker(env, worker, arr);
+            int res = arr[0];
 
-            const int LEN = 5;
-            int array[LEN] = {8888, 9999, 1, sum, ret};
+            int array[] = {res, 0x22222222, 0x33333333, res};
+            int len = sizeof(array) / sizeof(int);
 
-            logArray(array, LEN);
+            logArray(array, len);
+            LOGD("array[2] = %d", array[2]);
         }
     }
-    return ret;
 }

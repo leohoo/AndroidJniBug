@@ -30,6 +30,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "==============================");
     }
 
-    public native int nativeTest(Object worker);
+    public native void nativeTest(Object worker);
 }
 
